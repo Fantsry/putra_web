@@ -1,8 +1,32 @@
 "use client";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import "./globals.css"; // pastikan ini import CSS
 
 export default function HomePage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Jika sudah login, redirect berdasarkan role
+    if (status === "authenticated" && session?.user) {
+      if (session.user.role === "admin") {
+        router.push("/dashboard/admin");
+      } else if (session.user.role === "guru") {
+        router.push("/dashboard/guru");
+      }
+      // Jika member, tetap di halaman utama
+    }
+  }, [status, session, router]);
+
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
+    router.push("/");
+    router.refresh();
+  };
+
   const feedbacks = [
     {
       name: "Alif Alfathar",
@@ -25,20 +49,65 @@ export default function HomePage() {
     <div className="flex flex-col min-h-screen font-sans">
       {/* NAVBAR */}
       <header className="bg-gray-300 text-gray-900 p-5 shadow-md flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Tb e-Library</h1>
-        <div className="space-x-4">
-          <Link
-            href="/register"
-            className="bg-white text-gray-700 font-semibold px-4 py-2 rounded hover:bg-gray-100 transition"
-          >
-            Daftar
-          </Link>
-          <Link
-            href="/login"
-            className="bg-transparent border border-gray-700 px-4 py-2 rounded hover:bg-white hover:text-gray-700 transition"
-          >
-            Login
-          </Link>
+        <Link href="/" className="text-2xl font-bold hover:opacity-80 transition">
+          Tb e-Library
+        </Link>
+        <div className="space-x-4 flex items-center">
+          {status === "loading" ? (
+            <span className="text-gray-600">Loading...</span>
+          ) : session?.user ? (
+            <>
+              <Link
+                href="/books"
+                className="bg-white text-gray-700 font-semibold px-4 py-2 rounded hover:bg-gray-100 transition"
+              >
+                Buku
+              </Link>
+              {session.user.role === "admin" && (
+                <Link
+                  href="/dashboard/admin"
+                  className="bg-blue-600 text-white font-semibold px-4 py-2 rounded hover:bg-blue-700 transition"
+                >
+                  Dashboard Admin
+                </Link>
+              )}
+              {session.user.role === "guru" && (
+                <Link
+                  href="/dashboard/guru"
+                  className="bg-blue-600 text-white font-semibold px-4 py-2 rounded hover:bg-blue-700 transition"
+                >
+                  Dashboard Guru
+                </Link>
+              )}
+              <Link
+                href="/profile"
+                className="text-gray-700 font-semibold px-4 py-2 rounded hover:bg-gray-100 transition"
+              >
+                {session.user.name || session.user.email}
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="bg-red-600 text-white font-semibold px-4 py-2 rounded hover:bg-red-700 transition"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/register"
+                className="bg-white text-gray-700 font-semibold px-4 py-2 rounded hover:bg-gray-100 transition"
+              >
+                Daftar
+              </Link>
+              <Link
+                href="/login"
+                className="bg-transparent border border-gray-700 px-4 py-2 rounded hover:bg-white hover:text-gray-700 transition"
+              >
+                Login
+              </Link>
+            </>
+          )}
         </div>
       </header>
 
@@ -59,9 +128,12 @@ export default function HomePage() {
         </p>
 
         <div className="flex flex-wrap gap-4 justify-center">
-          <button className="px-8 py-3 bg-white text-gray-700 font-semibold rounded-xl shadow-lg hover:bg-gray-100 hover:scale-105 transition-all">
+          <Link
+            href="/books"
+            className="px-8 py-3 bg-white text-gray-700 font-semibold rounded-xl shadow-lg hover:bg-gray-100 hover:scale-105 transition-all"
+          >
             Jelajahi Buku
-          </button>
+          </Link>
           <button className="px-8 py-3 border border-gray-900 text-gray-900 font-semibold rounded-xl shadow-lg hover:bg-white hover:text-gray-700 hover:scale-105 transition-all">
             Pelajari Fitur
           </button>

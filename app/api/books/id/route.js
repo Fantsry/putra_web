@@ -6,9 +6,9 @@ export async function GET() {
   const conn = await pool.getConnection();
   try {
     const [books] = await conn.query(
-      `SELECT b.*, c.name AS category_name
-       FROM books b
-       LEFT JOIN book_categories c ON b.category_id = c.id`
+      `SELECT id, title, author, isbn, image, stock, available, created_at, updated_at
+       FROM books
+       ORDER BY created_at DESC`
     );
     return new Response(JSON.stringify(books), { status: 200 });
   } catch (error) {

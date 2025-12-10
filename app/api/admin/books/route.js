@@ -1,71 +1,43 @@
 import pool from "@/lib/db";
 
-// Route untuk GET semua buku (admin) & POST tambah buku baru
+// GET all books
 export async function GET() {
   const conn = await pool.getConnection();
   try {
     const [books] = await conn.query(
-      `SELECT b.*, c.name AS category_name
-       FROM books b
-       LEFT JOIN book_categories c ON b.category_id = c.id`
+      `SELECT id, title, author, isbn, image, stock, available, created_at, updated_at FROM books`
     );
     return new Response(JSON.stringify(books), { status: 200 });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-    });
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   } finally {
     conn.release();
   }
 }
 
+// POST create book
 export async function POST(req) {
-  const data = await req.json();
-  const {
-    title,
-    author,
-    isbn,
-    category_id,
-    description,
-    cover_url,
-    total_stock,
-  } = data;
+  const { title, author, isbn, image = null, stock = 0, available } = await req.json();
 
-  if (!title || !author || !total_stock) {
-    return new Response(
-      JSON.stringify({ error: "Title, author, and total_stock are required" }),
-      { status: 400 }
-    );
+  if (!title || !author || !isbn) {
+    return new Response(JSON.stringify({ error: "Title, author, and ISBN are required" }), { status: 400 });
   }
 
+  const initialAvailable = available ?? stock;
   const conn = await pool.getConnection();
   try {
     const [result] = await conn.query(
-      `INSERT INTO books
-        (title, author, isbn, category_id, description, cover_url, total_stock, available_stock, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
-      [
-        title,
-        author,
-        isbn || null,
-        category_id || null,
-        description || null,
-        cover_url || null,
-        total_stock,
-        total_stock,
-      ]
+      `INSERT INTO books (title, author, isbn, image, stock, available)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [title, author, isbn, image, stock, initialAvailable]
     );
+
     return new Response(
-      JSON.stringify({
-        message: "Book created successfully",
-        bookId: result.insertId,
-      }),
+      JSON.stringify({ message: "Book created", bookId: result.insertId }),
       { status: 201 }
     );
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-    });
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   } finally {
     conn.release();
   }

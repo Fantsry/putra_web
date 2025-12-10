@@ -1,36 +1,14 @@
 "use client";
-import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export default function LoginPage() {
-  const [identifier, setIdentifier] = useState("");
-  const [password, setPassword] = useState("");
+// Halaman ini diarahkan ke /login agar tidak ada dua versi form login.
+export default function LoginRedirectPage() {
+  const router = useRouter();
 
-  async function handleLogin(e) {
-    e.preventDefault();
-    const res = await signIn("credentials", {
-      redirect: false,
-      identifier,
-      password,
-    });
-    if (res.error) alert(res.error);
-    else window.location.href = "/"; // redirect home
-  }
+  useEffect(() => {
+    router.replace("/login");
+  }, [router]);
 
-  return (
-    <form onSubmit={handleLogin}>
-      <input
-        placeholder="Email atau NIPD"
-        value={identifier}
-        onChange={(e) => setIdentifier(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button type="submit">Login</button>
-    </form>
-  );
+  return <p style={{ padding: "1rem" }}>Mengalihkan ke halaman login...</p>;
 }

@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { FaEnvelope, FaLock } from "react-icons/fa";
+import { FaEnvelope, FaLock, FaUser } from "react-icons/fa";
 
 export default function RegisterPage() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -17,12 +19,12 @@ export default function RegisterPage() {
       return;
     }
 
+    setLoading(true);
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // hanya kirim email & password (name dihapus)
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, email, password }),
       });
 
       const data = await res.json();
@@ -31,10 +33,16 @@ export default function RegisterPage() {
         setMessage(data.error || "Registrasi gagal");
       } else {
         setMessage("Registrasi berhasil! Silahkan login.");
+        setName("");
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
       }
     } catch (err) {
       setMessage("Server error");
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -47,6 +55,19 @@ export default function RegisterPage() {
         </div>
 
         <form onSubmit={handleRegister} className="space-y-5">
+          {/* Nama */}
+          <div className="relative">
+            <FaUser className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Nama lengkap"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800 placeholder-gray-400"
+              required
+            />
+          </div>
+
           {/* Email */}
           <div className="relative">
             <FaEnvelope className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -88,9 +109,10 @@ export default function RegisterPage() {
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold hover:from-blue-600 hover:to-blue-700 transition shadow-md"
           >
-            Daftar
+            {loading ? "Memproses..." : "Daftar"}
           </button>
         </form>
 

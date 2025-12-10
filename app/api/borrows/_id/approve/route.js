@@ -1,7 +1,7 @@
 import pool from "@/lib/db";
 
-export async function POST(req) {
-  const { id } = req.params;
+export async function POST(req, { params }) {
+  const { id } = params || {};
   const { guru_id } = await req.json(); // siapa guru yang approve
 
   const conn = await pool.getConnection();

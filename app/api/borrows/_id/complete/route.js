@@ -1,7 +1,7 @@
 import pool from "@/lib/db";
 
-export async function POST(req) {
-  const { id } = req.params;
+export async function POST(_req, { params }) {
+  const { id } = params || {};
 
   const conn = await pool.getConnection();
   try {

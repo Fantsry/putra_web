@@ -1,6 +1,5 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
 import pool from "@/lib/db";
 import { verifyPassword } from "@/lib/auth";
 
@@ -9,51 +8,44 @@ export const authOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        identifier: { label: "Email/NIPD", type: "text" },
+        email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const { identifier, password } = credentials;
+        const { email, password } = credentials;
         const conn = await pool.getConnection();
         try {
-          const [users] = await conn.query(
-            "SELECT u.*, r.name AS role_name FROM users u JOIN roles r ON u.role_id = r.id WHERE email=? OR nipd=? LIMIT 1",
-            [identifier, identifier]
+          const [rows] = await conn.query(
+            "SELECT id, name, email, password, role FROM users WHERE email=? LIMIT 1",
+            [email]
           );
-          if (!users[0]) return null;
-
-          const user = users[0];
-          const isValid = await verifyPassword(password, user.password_hash);
-          if (!isValid) return null;
-
+          if (!rows[0]) return null;
+          const user = rows[0];
+          const ok = await verifyPassword(password, user.password);
+          if (!ok) return null;
           return {
             id: user.id,
             name: user.name,
             email: user.email,
-            role: user.role_name,
+            role: user.role,
           };
         } finally {
           conn.release();
         }
       },
     }),
-
-    // Optional Google OAuth
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    }),
   ],
 
-  session: {
-    strategy: "jwt",
-  },
+  session: { strategy: "jwt" },
+
+  secret: process.env.NEXTAUTH_SECRET || "default-secret-key-change-in-production",
 
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.name = user.name;
       }
       return token;
     },
@@ -61,13 +53,15 @@ export const authOptions = {
       if (token) {
         session.user.id = token.id;
         session.user.role = token.role;
+        session.user.name = token.name;
       }
       return session;
     },
   },
 
   pages: {
-    signIn: "/auth/login",
+    // gunakan halaman /login agar konsisten dengan navigasi utama
+    signIn: "/login",
   },
 };
 

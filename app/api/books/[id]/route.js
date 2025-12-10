@@ -70,6 +70,10 @@ export async function DELETE(_req, { params }) {
     return new Response(JSON.stringify({ message: "Book deleted" }), {
       status: 200,
     });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+    });
   } finally {
     conn.release();
   }

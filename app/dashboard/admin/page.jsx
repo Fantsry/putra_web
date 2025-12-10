@@ -11,13 +11,20 @@ export default async function AdminDashboard() {
   const session = await getServerSession(authOptions);
   if (!session || session.user?.role !== "admin") redirect("/login");
 
-  const [[stats]] = await pool.query(`
-    SELECT 
-      (SELECT COUNT(*) FROM books) as total_books,
-      (SELECT COUNT(*) FROM borrow_requests WHERE status = 'pending') as pending_requests,
-      (SELECT COUNT(*) FROM users WHERE role_id = (SELECT id FROM roles WHERE name = 'guru')) as total_teachers,
-      (SELECT COUNT(*) FROM borrow_requests WHERE status = 'active') as active_loans
-  `);
+  let stats;
+  try {
+    const [result] = await pool.query(`
+      SELECT 
+        (SELECT COUNT(*) FROM books) as total_books,
+        (SELECT COUNT(*) FROM borrows WHERE status = 'borrowed') as pending_requests,
+        (SELECT COUNT(*) FROM users WHERE role = 'guru') as total_teachers,
+        (SELECT COUNT(*) FROM borrows WHERE status = 'borrowed') as active_loans
+    `);
+    stats = result[0] || { total_books: 0, pending_requests: 0, total_teachers: 0, active_loans: 0 };
+  } catch (error) {
+    console.error("Error fetching stats:", error);
+    stats = { total_books: 0, pending_requests: 0, total_teachers: 0, active_loans: 0 };
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -62,11 +69,11 @@ export default async function AdminDashboard() {
             <h3 className="text-xl font-semibold">Kelola Buku</h3>
           </Link>
           <Link
-            href="/dashboard/admin/new"
+            href="/dashboard/admin/users"
             className="bg-white p-8 rounded-xl shadow hover:shadow-lg transition text-center border-2 border-dashed border-gray-300"
           >
-            <div className="text-5xl mb-4">Teacher</div>
-            <h3 className="text-xl font-semibold">Tambah Guru</h3>
+            <div className="text-5xl mb-4">👥</div>
+            <h3 className="text-xl font-semibold">Kelola Users</h3>
           </Link>
           <Link
             href="/dashboard/admin/transactions"

@@ -14,25 +14,30 @@ export default async function GuruDashboard() {
     redirect("/login");
   }
 
-  const [requests] = await pool.query(`
-    SELECT 
-      br.id,
-      br.request_date,
-      u.name AS user_name,
-      u.nipd,
-      u.email,
-      b.title,
-      b.author,
-      b.cover_url
-    FROM borrow_requests br
-    JOIN users u ON br.user_id = u.id
-    JOIN books b ON br.book_id = b.id
-    WHERE br.status = 'pending'
-    ORDER BY br.request_date DESC
-  `);
-
-  // Karena .js, ga perlu type → langsung pake
-  const pendingRequests = requests;
+  let pendingRequests = [];
+  try {
+    // Query borrows yang masih aktif (borrowed)
+    const [requests] = await pool.query(`
+      SELECT 
+        b.id,
+        b.borrow_date as request_date,
+        b.due_date,
+        u.name AS user_name,
+        u.email,
+        bk.title,
+        bk.author,
+        bk.image
+      FROM borrows b
+      JOIN users u ON b.user_id = u.id
+      JOIN books bk ON b.book_id = bk.id
+      WHERE b.status = 'borrowed'
+      ORDER BY b.borrow_date DESC
+    `);
+    pendingRequests = requests;
+  } catch (error) {
+    console.error("Error fetching borrows:", error);
+    pendingRequests = [];
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -56,9 +61,9 @@ export default async function GuruDashboard() {
               >
                 <div className="p-6">
                   <div className="flex items-start gap-4 mb-4">
-                    {req.cover_url ? (
+                    {req.image ? (
                       <Image
-                        src={req.cover_url}
+                        src={req.image}
                         alt={req.title}
                         width={80}
                         height={120}
@@ -90,10 +95,18 @@ export default async function GuruDashboard() {
                     </p>
                     <p>
                       <span className="font-medium text-gray-700">
-                        Tanggal Request:
+                        Tanggal Pinjam:
                       </span>{" "}
                       {new Date(req.request_date).toLocaleDateString("id-ID")}
                     </p>
+                    {req.due_date && (
+                      <p>
+                        <span className="font-medium text-gray-700">
+                          Jatuh Tempo:
+                        </span>{" "}
+                        {new Date(req.due_date).toLocaleDateString("id-ID")}
+                      </p>
+                    )}
                   </div>
 
                   <div className="mt-6 flex gap-3">
