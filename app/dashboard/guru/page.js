@@ -1,5 +1,5 @@
 // app/dashboard/guru/page.js
-import { pool } from "@/lib/db";
+import pool from "@/lib/db";
 import { approveBorrowRequest, rejectBorrowRequest } from "./actions";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";

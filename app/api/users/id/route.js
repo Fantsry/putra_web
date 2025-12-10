@@ -1,7 +1,7 @@
 // app/api/users/id/route.js
 import pool from "@/lib/db";
 import { getToken } from "next-auth/jwt";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 const SECRET = process.env.NEXTAUTH_SECRET;
 

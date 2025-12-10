@@ -1,7 +1,7 @@
 // app/dashboard/admin/actions.js
 "use server";
 
-import { pool } from "@/lib/db";
+import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -9,8 +9,7 @@ import bcrypt from "bcryptjs";
 
 const checkAdmin = async () => {
   const session = await getServerSession(authOptions);
-  if (!session || session.user?.role !== "admin")
-    throw new Error("Akses ditolak");
+  if (!session || session.user?.role !== "admin") throw new Error("Akses ditolak");
   return session;
 };
 

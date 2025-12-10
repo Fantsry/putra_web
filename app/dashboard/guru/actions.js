@@ -1,7 +1,7 @@
 // app/dashboard/guru/actions.js
 "use server";
 
-import { pool } from "@/lib/db";
+import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
