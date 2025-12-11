@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import Navbar from "@/app/components/Navbar";
 import "./globals.css"; // pastikan ini import CSS
 
 export default function HomePage() {
@@ -20,12 +21,6 @@ export default function HomePage() {
       // Jika member, tetap di halaman utama
     }
   }, [status, session, router]);
-
-  const handleLogout = async () => {
-    await signOut({ redirect: false });
-    router.push("/");
-    router.refresh();
-  };
 
   const feedbacks = [
     {
@@ -47,69 +42,7 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen font-sans">
-      {/* NAVBAR */}
-      <header className="bg-gray-300 text-gray-900 p-5 shadow-md flex justify-between items-center">
-        <Link href="/" className="text-2xl font-bold hover:opacity-80 transition">
-          Tb e-Library
-        </Link>
-        <div className="space-x-4 flex items-center">
-          {status === "loading" ? (
-            <span className="text-gray-600">Loading...</span>
-          ) : session?.user ? (
-            <>
-              <Link
-                href="/books"
-                className="bg-white text-gray-700 font-semibold px-4 py-2 rounded hover:bg-gray-100 transition"
-              >
-                Buku
-              </Link>
-              {session.user.role === "admin" && (
-                <Link
-                  href="/dashboard/admin"
-                  className="bg-blue-600 text-white font-semibold px-4 py-2 rounded hover:bg-blue-700 transition"
-                >
-                  Dashboard Admin
-                </Link>
-              )}
-              {session.user.role === "guru" && (
-                <Link
-                  href="/dashboard/guru"
-                  className="bg-blue-600 text-white font-semibold px-4 py-2 rounded hover:bg-blue-700 transition"
-                >
-                  Dashboard Guru
-                </Link>
-              )}
-              <Link
-                href="/profile"
-                className="text-gray-700 font-semibold px-4 py-2 rounded hover:bg-gray-100 transition"
-              >
-                {session.user.name || session.user.email}
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="bg-red-600 text-white font-semibold px-4 py-2 rounded hover:bg-red-700 transition"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/register"
-                className="bg-white text-gray-700 font-semibold px-4 py-2 rounded hover:bg-gray-100 transition"
-              >
-                Daftar
-              </Link>
-              <Link
-                href="/login"
-                className="bg-transparent border border-gray-700 px-4 py-2 rounded hover:bg-white hover:text-gray-700 transition"
-              >
-                Login
-              </Link>
-            </>
-          )}
-        </div>
-      </header>
+      <Navbar />
 
       {/* HERO SECTION */}
       <section className="relative overflow-hidden bg-gradient-to-br from-gray-400 via-gray-300 to-gray-200 text-gray-900 py-48 px-6 flex flex-col items-center justify-center text-center">

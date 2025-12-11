@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import Navbar from "@/app/components/Navbar";
 
 export default function BookDetailPage() {
   const params = useParams();
@@ -99,8 +100,17 @@ export default function BookDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-5xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        <div className="mb-6">
+          <Link
+            href="/books"
+            className="text-blue-600 hover:underline flex items-center gap-2"
+          >
+            ← Kembali ke Daftar Buku
+          </Link>
+        </div>
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="flex flex-col md:flex-row gap-8 p-8">
             <div className="w-full md:w-80 flex-shrink-0">

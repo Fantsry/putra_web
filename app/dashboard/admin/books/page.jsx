@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Navbar from "@/app/components/Navbar";
 
 export default function AdminBooksPage() {
   const [books, setBooks] = useState([]);
@@ -26,9 +27,19 @@ export default function AdminBooksPage() {
   }
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Kelola Buku</h1>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-6">
+          <Link
+            href="/dashboard/admin"
+            className="text-blue-600 hover:underline flex items-center gap-2"
+          >
+            ← Kembali ke Dashboard Admin
+          </Link>
+        </div>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-semibold">Kelola Buku</h1>
         <Link
           href="/dashboard/admin/books/new"
           className="px-4 py-2 bg-blue-600 text-white rounded-lg"
@@ -52,12 +63,16 @@ export default function AdminBooksPage() {
           {books.map((b) => (
             <tr key={b.id} className="border-b">
               <td className="p-3">
-                <img src={b.cover_url} className="h-14 rounded" />
+                {b.image ? (
+                  <img src={b.image} alt={b.title} className="h-14 rounded object-cover" />
+                ) : (
+                  <div className="h-14 w-10 bg-gray-200 rounded flex items-center justify-center">📚</div>
+                )}
               </td>
               <td className="p-3">{b.title}</td>
               <td className="p-3">{b.author}</td>
               <td className="p-3">
-                {b.available_stock} / {b.total_stock}
+                {b.available || 0} / {b.stock || 0}
               </td>
               <td className="p-3 flex gap-3">
                 <button
@@ -71,6 +86,7 @@ export default function AdminBooksPage() {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

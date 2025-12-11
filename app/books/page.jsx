@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import Navbar from "@/app/components/Navbar";
 
 export default function BooksPage() {
   const [books, setBooks] = useState([]);
@@ -59,8 +60,17 @@ export default function BooksPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-6">
+          <Link
+            href="/"
+            className="text-blue-600 hover:underline flex items-center gap-2"
+          >
+            ← Kembali ke Beranda
+          </Link>
+        </div>
         <h1 className="text-4xl font-bold text-gray-900 mb-8">Daftar Buku</h1>
         
         {books.length === 0 ? (

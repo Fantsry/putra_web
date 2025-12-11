@@ -5,6 +5,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
+import Navbar from "@/app/components/Navbar";
 
 export const revalidate = 0;
 
@@ -41,7 +43,16 @@ export default async function GuruDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="mb-6">
+          <Link
+            href="/"
+            className="text-blue-600 hover:underline flex items-center gap-2"
+          >
+            ← Kembali ke Beranda
+          </Link>
+        </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
           Dashboard Guru — Persetujuan Peminjaman
         </h1>

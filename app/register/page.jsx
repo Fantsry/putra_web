@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { FaEnvelope, FaLock, FaUser } from "react-icons/fa";
+import Link from "next/link";
+import Navbar from "@/app/components/Navbar";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -47,12 +49,22 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100">
-      <div className="bg-white p-12 rounded-3xl shadow-xl border border-gray-200 w-full max-w-lg">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-extrabold text-gray-800 mb-2">TB e-Library</h1>
-          <p className="text-gray-500">Buat akun baru Anda</p>
-        </div>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <div className="flex items-center justify-center min-h-[80vh] py-8">
+        <div className="bg-white p-12 rounded-3xl shadow-xl border border-gray-200 w-full max-w-lg">
+          <div className="mb-4">
+            <Link
+              href="/"
+              className="text-blue-600 hover:underline flex items-center gap-2 text-sm"
+            >
+              ← Kembali ke Beranda
+            </Link>
+          </div>
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-extrabold text-gray-800 mb-2">TB e-Library</h1>
+            <p className="text-gray-500">Buat akun baru Anda</p>
+          </div>
 
         <form onSubmit={handleRegister} className="space-y-5">
           {/* Nama */}
@@ -126,15 +138,16 @@ export default function RegisterPage() {
           </p>
         )}
 
-        <p className="mt-6 text-center text-gray-500">
-          Sudah punya akun?{" "}
-          <a
-            href="/login"
-            className="text-blue-600 font-semibold hover:underline"
-          >
-            Masuk di sini
-          </a>
-        </p>
+          <p className="mt-6 text-center text-gray-500">
+            Sudah punya akun?{" "}
+            <Link
+              href="/login"
+              className="text-blue-600 font-semibold hover:underline"
+            >
+              Masuk di sini
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
